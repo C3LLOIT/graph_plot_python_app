@@ -1,0 +1,51 @@
+id,name,age,salary,department,join_date,performance_score,years_experience,is_active,city
+1,Alice Johnson,28,65000,Engineering,2020-03-15,4.2,5,TRUE,New York
+2,Bob Smith,35,78000,Marketing,2018-07-22,3.8,8,TRUE,Los Angeles
+3,Carol Williams,42,92000,Engineering,2015-01-10,4.5,12,TRUE,Chicago
+4,David Brown,31,71000,Sales,2019-11-05,3.5,6,TRUE,Houston
+5,Eve Davis,26,58000,Engineering,2021-06-20,4.0,3,TRUE,Phoenix
+6,Frank Miller,45,105000,Management,2012-04-18,4.8,15,TRUE,Philadelphia
+7,Grace Wilson,33,82000,Marketing,2017-09-12,4.1,9,TRUE,San Antonio
+8,Henry Moore,29,67000,Engineering,2020-08-30,3.9,4,TRUE,San Diego
+9,Ivy Taylor,38,88000,Sales,2016-02-28,4.3,10,TRUE,Dallas
+10,Jack Anderson,27,62000,Engineering,2021-01-15,3.7,4,TRUE,San Jose
+11,Kate Thomas,41,95000,Management,2014-05-20,4.6,13,TRUE,Austin
+12,Leo Jackson,34,76000,Marketing,2018-03-08,3.6,7,FALSE,Jacksonville
+13,Mia White,30,70000,Engineering,2019-07-14,4.2,5,TRUE,Fort Worth
+14,Noah Harris,36,84000,Sales,2017-11-25,4.0,8,TRUE,Columbus
+15,Olivia Martin,25,55000,Engineering,2022-02-01,3.4,2,TRUE,Charlotte
+16,Peter Garcia,44,98000,Management,2013-08-15,4.7,14,TRUE,Seattle
+17,Quinn Martinez,32,73000,Marketing,2019-04-22,3.8,6,TRUE,Denver
+18,Rose Robinson,28,64000,Engineering,2020-10-10,4.1,4,TRUE,Boston
+19,Sam Clark,39,90000,Sales,2016-06-05,4.4,11,TRUE,Nashville
+20,Tina Rodriguez,31,69000,Engineering,2019-12-18,3.9,5,TRUE,Portland
+21,Uma Lewis,37,86000,Marketing,2017-01-30,4.2,9,FALSE,Oklahoma City
+22,Victor Lee,43,100000,Management,2014-09-12,4.5,12,TRUE,Las Vegas
+23,Wendy Walker,29,66000,Engineering,2020-05-25,3.8,4,TRUE,Memphis
+24,Xander Hall,35,80000,Sales,2018-02-14,4.0,7,TRUE,Louisville
+25,Yara Allen,26,59000,Engineering,2021-08-08,3.6,3,TRUE,Baltimore
+26,Zach Young,40,93000,Management,2015-11-20,4.6,11,TRUE,Milwaukee
+27,Amy Hernandez,33,75000,Marketing,2018-06-17,4.1,8,TRUE,Albuquerque
+28,Ben King,30,68000,Engineering,2019-09-28,3.7,5,TRUE,Tucson
+29,Clara Wright,46,110000,Management,2011-03-05,4.9,16,TRUE,Fresno
+30,Dan Scott,28,63000,Sales,2020-12-12,3.5,3,TRUE,Sacramento
+31,Emma Green,34,77000,Engineering,2018-04-30,4.3,7,TRUE,Kansas City
+32,Fred Adams,31,72000,Marketing,2019-02-18,3.9,6,FALSE,Mesa
+33,Gina Baker,27,60000,Engineering,2021-04-05,3.8,3,TRUE,Atlanta
+34,Harry Nelson,42,96000,Sales,2015-07-22,4.4,12,TRUE,Miami
+35,Irene Carter,36,85000,Engineering,2017-10-08,4.2,9,TRUE,Cleveland
+36,James Mitchell,29,67500,Marketing,2020-01-20,3.6,4,TRUE,Raleigh
+37,Kelly Perez,38,89000,Management,2016-08-14,4.5,10,TRUE,Omaha
+38,Larry Roberts,32,74000,Engineering,2018-11-25,4.0,6,TRUE,Minneapolis
+39,Mary Turner,25,56000,Sales,2022-03-10,3.4,2,TRUE,Tulsa
+40,Nick Phillips,44,97000,Engineering,2013-12-01,4.7,14,TRUE,Arlington
+41,Olga Campbell,30,71000,Marketing,2019-06-15,3.8,5,TRUE,New Orleans
+42,Paul Parker,37,87000,Sales,2017-03-28,4.3,9,TRUE,Wichita
+43,Quincy Evans,33,79000,Engineering,2018-08-10,4.1,7,TRUE,Bakersfield
+44,Rita Edwards,41,94000,Management,2015-02-22,4.6,12,TRUE,Tampa
+45,Steve Collins,28,65500,Engineering,2020-07-05,3.9,4,TRUE,Honolulu
+46,Tracy Stewart,35,81000,Marketing,2017-12-18,4.0,8,FALSE,Aurora
+47,Ulysses Sanchez,39,91000,Sales,2016-04-30,4.4,10,TRUE,Anaheim
+48,Vera Morris,26,57000,Engineering,2021-09-22,3.5,2,TRUE,Santa Ana
+49,Wade Rogers,43,99000,Management,2014-06-08,4.8,13,TRUE,St. Louis
+50,Xena Reed,31,70500,Engineering,2019-10-15,4.2,5,TRUE,Riverside
