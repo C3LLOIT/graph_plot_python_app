@@ -155,11 +155,16 @@ class DataLoader:
                 date_keywords = ['date', 'time', 'timestamp', 'created', 'updated', 'datetime']
                 if any(kw in col.lower() for kw in date_keywords):
                     try:
-                        self.current_df[col] = pd.to_datetime(
-                            self.current_df[col],
-                            infer_datetime_format=True,
-                            errors='coerce'
-                        )
+                        # Optimization: Use a sample to see if it's likely a date before trying to convert the whole column
+                        sample = self.current_df[col].dropna().head(100)
+                        if not sample.empty:
+                            # Use format='infer' or just let pandas handle it, but only if it looks like a date
+                            pd.to_datetime(sample, errors='raise')
+
+                            self.current_df[col] = pd.to_datetime(
+                                self.current_df[col],
+                                errors='coerce'
+                            )
                     except:
                         pass
     

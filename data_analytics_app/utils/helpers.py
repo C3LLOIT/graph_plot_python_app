@@ -50,21 +50,36 @@ class TypeDetector:
             return cls.TYPE_NUMERIC
         
         # Check for categorical or object type
-        if pd.api.types.is_categorical_dtype(series):
+        # In pandas 2.0+, is_categorical_dtype is deprecated, using isinstance or dtypes directly
+        if isinstance(series.dtype, pd.CategoricalDtype):
             return cls.TYPE_CATEGORICAL
         
         # For object dtype, try to determine if it's categorical or text
-        if series.dtype == 'object':
-            # Try to parse as datetime
-            try:
-                pd.to_datetime(series.dropna().head(100))
-                return cls.TYPE_DATETIME
-            except:
-                pass
+        if series.dtype == 'object' or series.dtype == 'string':
+            # Try to parse as datetime (only if column name suggests it or sample looks like it)
+            # Sampling first 10 rows for quick check
+            sample = series.dropna().head(10)
+            if not sample.empty:
+                try:
+                    # Using a very restrictive check for speed
+                    pd.to_datetime(sample, errors='raise')
+                    return cls.TYPE_DATETIME
+                except:
+                    pass
             
             # Check unique ratio to determine if categorical
-            unique_ratio = series.nunique() / len(series) if len(series) > 0 else 1
-            if unique_ratio < 0.5 or series.nunique() <= 20:
+            # Optimization: for large series, only check unique ratio on a sample if it's very large
+            if len(series) > 10000:
+                # Sample for nunique if it's very large
+                sample_for_unique = series.sample(n=10000, random_state=42)
+                n_unique_sample = sample_for_unique.nunique()
+                unique_ratio = n_unique_sample / 10000
+                n_unique = n_unique_sample # Approximation for the check below
+            else:
+                n_unique = series.nunique()
+                unique_ratio = n_unique / len(series) if len(series) > 0 else 1
+
+            if unique_ratio < 0.5 or n_unique <= 20:
                 return cls.TYPE_CATEGORICAL
             else:
                 return cls.TYPE_TEXT

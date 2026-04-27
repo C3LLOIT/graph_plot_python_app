@@ -127,27 +127,33 @@ class DataPreviewPanel(wx.Panel):
         if n_rows == 0 or n_cols == 0:
             return
         
-        # Resize grid
-        self.grid.AppendRows(n_rows)
-        self.grid.AppendCols(n_cols)
+        # Disable grid updates for batch population
+        self.grid.BeginBatch()
         
-        # Set column labels
-        for col_idx, col_name in enumerate(preview_df.columns):
-            self.grid.SetColLabelValue(col_idx, str(col_name))
-        
-        # Populate cells
-        for row_idx in range(n_rows):
-            for col_idx in range(n_cols):
-                value = preview_df.iloc[row_idx, col_idx]
-                # Format value for display
-                if pd.isna(value):
-                    display_value = ""
-                else:
-                    display_value = Formatter.truncate_string(str(value), 50)
-                self.grid.SetCellValue(row_idx, col_idx, display_value)
-        
-        # Auto-size columns
-        self.grid.AutoSizeColumns()
+        try:
+            # Resize grid
+            self.grid.AppendRows(n_rows)
+            self.grid.AppendCols(n_cols)
+
+            # Set column labels
+            for col_idx, col_name in enumerate(preview_df.columns):
+                self.grid.SetColLabelValue(col_idx, str(col_name))
+
+            # Populate cells
+            for row_idx in range(n_rows):
+                for col_idx in range(n_cols):
+                    value = preview_df.iloc[row_idx, col_idx]
+                    # Format value for display
+                    if pd.isna(value):
+                        display_value = ""
+                    else:
+                        display_value = Formatter.truncate_string(str(value), 50)
+                    self.grid.SetCellValue(row_idx, col_idx, display_value)
+
+            # Auto-size columns
+            self.grid.AutoSizeColumns()
+        finally:
+            self.grid.EndBatch()
     
     def _clear_grid(self):
         """Clear all grid contents."""
@@ -267,24 +273,28 @@ class StatisticsPanel(wx.Panel):
         if stats_df.empty:
             return
         
-        # Populate grid
-        n_rows, n_cols = stats_df.shape
-        self.stats_grid.AppendRows(n_rows)
-        self.stats_grid.AppendCols(n_cols + 1)  # +1 for index column
-        
-        # Set column labels
-        self.stats_grid.SetColLabelValue(0, "Column")
-        for col_idx, col_name in enumerate(stats_df.columns):
-            self.stats_grid.SetColLabelValue(col_idx + 1, str(col_name))
-        
-        # Populate data
-        for row_idx, (index, row) in enumerate(stats_df.iterrows()):
-            self.stats_grid.SetCellValue(row_idx, 0, str(index))
-            for col_idx, value in enumerate(row):
-                formatted = Formatter.format_number(value) if not pd.isna(value) else "N/A"
-                self.stats_grid.SetCellValue(row_idx, col_idx + 1, formatted)
-        
-        self.stats_grid.AutoSizeColumns()
+        self.stats_grid.BeginBatch()
+        try:
+            # Populate grid
+            n_rows, n_cols = stats_df.shape
+            self.stats_grid.AppendRows(n_rows)
+            self.stats_grid.AppendCols(n_cols + 1)  # +1 for index column
+
+            # Set column labels
+            self.stats_grid.SetColLabelValue(0, "Column")
+            for col_idx, col_name in enumerate(stats_df.columns):
+                self.stats_grid.SetColLabelValue(col_idx + 1, str(col_name))
+
+            # Populate data
+            for row_idx, (index, row) in enumerate(stats_df.iterrows()):
+                self.stats_grid.SetCellValue(row_idx, 0, str(index))
+                for col_idx, value in enumerate(row):
+                    formatted = Formatter.format_number(value) if not pd.isna(value) else "N/A"
+                    self.stats_grid.SetCellValue(row_idx, col_idx + 1, formatted)
+
+            self.stats_grid.AutoSizeColumns()
+        finally:
+            self.stats_grid.EndBatch()
     
     def _update_column_grid(self):
         """Update the column information grid."""
@@ -298,26 +308,30 @@ class StatisticsPanel(wx.Panel):
         if column_info.empty:
             return
         
-        # Populate grid
-        n_rows, n_cols = column_info.shape
-        self.column_grid.AppendRows(n_rows)
-        self.column_grid.AppendCols(n_cols)
-        
-        # Set column labels
-        for col_idx, col_name in enumerate(column_info.columns):
-            self.column_grid.SetColLabelValue(col_idx, str(col_name))
-        
-        # Populate data
-        for row_idx in range(n_rows):
-            for col_idx in range(n_cols):
-                value = column_info.iloc[row_idx, col_idx]
-                if isinstance(value, float):
-                    formatted = Formatter.format_number(value)
-                else:
-                    formatted = str(value)
-                self.column_grid.SetCellValue(row_idx, col_idx, formatted)
-        
-        self.column_grid.AutoSizeColumns()
+        self.column_grid.BeginBatch()
+        try:
+            # Populate grid
+            n_rows, n_cols = column_info.shape
+            self.column_grid.AppendRows(n_rows)
+            self.column_grid.AppendCols(n_cols)
+
+            # Set column labels
+            for col_idx, col_name in enumerate(column_info.columns):
+                self.column_grid.SetColLabelValue(col_idx, str(col_name))
+
+            # Populate data
+            for row_idx in range(n_rows):
+                for col_idx in range(n_cols):
+                    value = column_info.iloc[row_idx, col_idx]
+                    if isinstance(value, float):
+                        formatted = Formatter.format_number(value)
+                    else:
+                        formatted = str(value)
+                    self.column_grid.SetCellValue(row_idx, col_idx, formatted)
+
+            self.column_grid.AutoSizeColumns()
+        finally:
+            self.column_grid.EndBatch()
     
     def _update_insights(self):
         """Update the insights text."""
@@ -528,7 +542,7 @@ class VisualizationPanel(wx.Panel):
         else:
             self.x_column_label.SetLabel("X-Axis Column:")
             self.x_column_combo.Enable(True)
-    
+
     def _on_generate(self, event):
         """Handle Generate Plot button click."""
         if self.df is None or self.df.empty:
@@ -559,8 +573,7 @@ class VisualizationPanel(wx.Panel):
             return
         
         try:
-            # Clear the figure
-            self.figure.clear()
+            wx.BeginBusyCursor()
             
             chart_name = Visualizer.CHART_TYPES[chart_idx][0]
             title = f"{chart_name}"
@@ -569,16 +582,13 @@ class VisualizationPanel(wx.Panel):
                 if y_col:
                     title += f" vs {y_col}"
             
-            # Create an axes on our figure
-            ax = self.figure.add_subplot(111)
+            # Use the visualizer to create the figure (it has sampling logic)
+            self.current_figure = self.visualizer.create_chart(self.df, chart_type, x_col, y_col, title)
             
-            # Draw directly on the provided axes
-            self._draw_chart(ax, chart_type, x_col, y_col, title)
+            # Update the canvas with the new figure
+            self.canvas.figure = self.current_figure
+            self.current_figure.set_canvas(self.canvas)
             
-            # Store reference for saving
-            self.current_figure = self.figure
-            
-            self.figure.tight_layout()
             self.canvas.draw()
             
             self.save_btn.Enable(True)
@@ -589,134 +599,8 @@ class VisualizationPanel(wx.Panel):
             traceback.print_exc()
             wx.MessageBox(f"Error generating chart: {str(e)}", "Error", wx.OK | wx.ICON_ERROR)
             self.status_label.SetLabel(f"Error: {str(e)}")
-    
-    def _draw_chart(self, ax, chart_type, x_col, y_col, title):
-        """
-        Draw a chart directly onto the provided axes.
-        
-        Args:
-            ax: matplotlib Axes to draw on
-            chart_type: Type of chart to draw
-            x_col: X-axis column name
-            y_col: Y-axis column name (optional)
-            title: Chart title
-        """
-        import seaborn as sns
-        
-        df = self.df
-        
-        if chart_type == Visualizer.CHART_LINE:
-            # Line chart
-            data = df[[x_col, y_col]].dropna().copy()
-            if pd.api.types.is_numeric_dtype(data[x_col]) or pd.api.types.is_datetime64_any_dtype(data[x_col]):
-                data = data.sort_values(x_col)
-            ax.plot(data[x_col], data[y_col], marker='o', markersize=3, linewidth=1.5)
-            ax.set_xlabel(x_col)
-            ax.set_ylabel(y_col)
-            
-        elif chart_type == Visualizer.CHART_BAR:
-            # Bar chart
-            if y_col is None or y_col == "(Count)":
-                value_counts = df[x_col].value_counts().head(20)
-                colors = sns.color_palette("husl", len(value_counts))
-                ax.bar(range(len(value_counts)), value_counts.values, color=colors)
-                ax.set_xticks(range(len(value_counts)))
-                ax.set_xticklabels(value_counts.index, rotation=45, ha='right')
-                ax.set_ylabel("Count")
-            else:
-                grouped = df.groupby(x_col)[y_col].mean().head(20)
-                colors = sns.color_palette("husl", len(grouped))
-                ax.bar(range(len(grouped)), grouped.values, color=colors)
-                ax.set_xticks(range(len(grouped)))
-                ax.set_xticklabels(grouped.index, rotation=45, ha='right')
-                ax.set_ylabel(f"Mean {y_col}")
-            ax.set_xlabel(x_col)
-            
-        elif chart_type == Visualizer.CHART_HISTOGRAM:
-            # Histogram
-            data = df[x_col].dropna()
-            # Try to convert to numeric if not already
-            if not pd.api.types.is_numeric_dtype(data):
-                try:
-                    data = pd.to_numeric(data, errors='coerce').dropna()
-                except:
-                    pass
-            
-            if len(data) == 0 or not pd.api.types.is_numeric_dtype(data):
-                ax.text(0.5, 0.5, f"Column '{x_col}' is not numeric.\nPlease select a numeric column for histogram.", 
-                       ha='center', va='center', fontsize=11, transform=ax.transAxes)
-            else:
-                ax.hist(data, bins=30, edgecolor='white', alpha=0.7, color='steelblue')
-            ax.set_xlabel(x_col)
-            ax.set_ylabel("Frequency")
-            
-        elif chart_type == Visualizer.CHART_SCATTER:
-            # Scatter plot
-            data = df[[x_col, y_col]].dropna()
-            ax.scatter(data[x_col], data[y_col], alpha=0.6, color='steelblue')
-            ax.set_xlabel(x_col)
-            ax.set_ylabel(y_col)
-            
-        elif chart_type == Visualizer.CHART_BOX:
-            # Box plot
-            cols = [x_col]
-            if y_col and y_col != "(None)":
-                cols.append(y_col)
-            numeric_cols = [c for c in cols if c in df.columns and pd.api.types.is_numeric_dtype(df[c])]
-            if numeric_cols:
-                data = df[numeric_cols].dropna()
-                bp = ax.boxplot(data.values, patch_artist=True, labels=numeric_cols)
-                colors = sns.color_palette("husl", len(numeric_cols))
-                for patch, color in zip(bp['boxes'], colors):
-                    patch.set_facecolor(color)
-                    patch.set_alpha(0.7)
-            ax.set_ylabel("Value")
-            
-        elif chart_type == Visualizer.CHART_PIE:
-            # Pie chart
-            value_counts = df[x_col].value_counts().head(10)
-            colors = sns.color_palette("husl", len(value_counts))
-            wedges, texts, autotexts = ax.pie(
-                value_counts.values,
-                labels=value_counts.index,
-                autopct='%1.1f%%',
-                colors=colors,
-                startangle=90
-            )
-            for autotext in autotexts:
-                autotext.set_fontsize(8)
-                autotext.set_color('white')
-                autotext.set_fontweight('bold')
-            
-        elif chart_type == Visualizer.CHART_HEATMAP:
-            # Correlation heatmap
-            numeric_df = df.select_dtypes(include=[np.number])
-            if len(numeric_df.columns) >= 2:
-                corr = numeric_df.corr()
-                sns.heatmap(
-                    corr,
-                    annot=True,
-                    fmt='.2f',
-                    cmap='RdBu_r',
-                    center=0,
-                    square=True,
-                    linewidths=0.5,
-                    ax=ax,
-                    vmin=-1,
-                    vmax=1,
-                    annot_kws={'size': 8}
-                )
-            else:
-                ax.text(0.5, 0.5, "Need at least 2 numeric columns", 
-                       ha='center', va='center', fontsize=12)
-        
-        ax.set_title(title, fontsize=12, fontweight='bold')
-        
-        # Rotate x-axis labels if needed (except for pie and heatmap)
-        if chart_type not in [Visualizer.CHART_PIE, Visualizer.CHART_HEATMAP]:
-            for label in ax.get_xticklabels():
-                label.set_rotation(45)
-                label.set_ha('right')
+        finally:
+            wx.EndBusyCursor()
     
     def _on_save(self, event):
         """Handle Save Plot button click."""

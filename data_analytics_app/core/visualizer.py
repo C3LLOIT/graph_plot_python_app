@@ -61,6 +61,9 @@ class Visualizer:
         # Default figure size
         self.figsize = (10, 6)
         self.dpi = 100
+
+        # Maximum points to plot before sampling for performance
+        self.max_plot_points = 50000
     
     def create_figure(self, figsize: Optional[Tuple[int, int]] = None) -> Figure:
         """
@@ -75,6 +78,17 @@ class Visualizer:
         size = figsize or self.figsize
         return Figure(figsize=size, dpi=self.dpi)
     
+    def _get_sampled_df(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, bool]:
+        """
+        Sample the DataFrame if it exceeds max_plot_points.
+
+        Returns:
+            Tuple of (sampled_df, was_sampled)
+        """
+        if len(df) > self.max_plot_points:
+            return df.sample(n=self.max_plot_points, random_state=42), True
+        return df, False
+
     def line_chart(
         self,
         df: pd.DataFrame,
@@ -103,8 +117,12 @@ class Visualizer:
         fig = self.create_figure(figsize)
         ax = fig.add_subplot(111)
         
+        df_sampled, was_sampled = self._get_sampled_df(df)
+        if was_sampled:
+            title += f" (Sampled {self.max_plot_points:,} pts)"
+
         # Sort by x if it's numeric or datetime
-        data = df[[x_column, y_column]].dropna().copy()
+        data = df_sampled[[x_column, y_column]].dropna().copy()
         if pd.api.types.is_numeric_dtype(data[x_column]) or pd.api.types.is_datetime64_any_dtype(data[x_column]):
             data = data.sort_values(x_column)
         
@@ -254,11 +272,15 @@ class Visualizer:
         fig = self.create_figure(figsize)
         ax = fig.add_subplot(111)
         
-        data = df[[x_column, y_column]].dropna()
+        df_plot, was_sampled = self._get_sampled_df(df)
+        if was_sampled:
+            title += f" (Sampled {self.max_plot_points:,} pts)"
+
+        data = df_plot[[x_column, y_column]].dropna()
         
-        if hue_column and hue_column in df.columns:
+        if hue_column and hue_column in df_plot.columns:
             # Add hue data
-            hue_data = df.loc[data.index, hue_column]
+            hue_data = df_plot.loc[data.index, hue_column]
             scatter = ax.scatter(data[x_column], data[y_column], c=pd.Categorical(hue_data).codes, 
                                 alpha=0.6, cmap='viridis')
             # Add legend
@@ -309,7 +331,11 @@ class Visualizer:
             ax.text(0.5, 0.5, "No numeric columns selected", ha='center', va='center', fontsize=12)
             return fig
         
-        data = df[numeric_cols].dropna()
+        df_sampled, was_sampled = self._get_sampled_df(df)
+        if was_sampled:
+            title += f" (Sampled {self.max_plot_points:,} pts)"
+
+        data = df_sampled[numeric_cols].dropna()
         
         bp = ax.boxplot(data.values, patch_artist=True, labels=numeric_cols)
         
